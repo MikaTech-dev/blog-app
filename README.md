@@ -78,3 +78,109 @@ ___
 – Host it on PipeOps/Heroku
 
 – Share the PipeOps/Heroku link and the GitHub link using the AltSchool of Engineering Tinyuka Second Semester Project Submission (Nodejs)
+
+
+# Blogging API Specification
+This README outlines the specifications and requirements for building a RESTful Blogging API. Use this document as a guide to implement a complete and functional API service.
+## Project Objective
+Build a blogging platform backend API where users can:
+- Register and authenticate
+- Create and manage blog posts (drafts and published)
+- Read and search for blogs (even without being logged in)
+- Track reading analytics
+---
+## Requirements
+### Authentication
+- Use JWT for authentication.
+- Tokens must expire after 1 hour.
+- Users must be authenticated to perform any blog creation, update, delete, or state-change actions.
+---
+## User Functionality
+- Users must be able to:
+  - Sign up (first_name, last_name, email, password)
+  - Sign in (returns JWT token)
+---
+## Blog Functionality
+- Blog States: draft or published
+- Anyone (logged in or not) should be able to:
+  - Fetch all published blogs (paginated, searchable, filterable)
+  - Fetch a single published blog (with author details and read_count incremented)
+- Authenticated users (only the owner of a blog) should be able to:
+  - Create blogs (initial state is draft)
+  - Edit blogs in any state
+  - Change blog state from draft to published
+  - Delete blogs in any state
+  - View their own blogs (with filtering by state)
+---
+## Blog Model
+Each blog/article must include:
+| Field         | Type     | Description                                    |
+|---------------|----------|------------------------------------------------|
+| title         | String   | Required, must be unique                      |
+| description   | String   | Optional                                      |
+| author        | ObjectId | Refers to the User who owns the blog          |
+| state         | String   | Either draft or published                 |
+| read_count    | Number   | Increments on every published blog read       |
+| reading_time  | Number   | Calculated based on body word count           |
+| tags          | [String] | Optional                                      |
+| body          | String   | Required                                      |
+| timestamp     | Date     | Automatically generated at blog creation      |
+---
+## Reading Time Algorithm
+You may use an average reading speed (e.g., 200 words per minute) to calculate reading time:
+
+---
+## API Endpoints
+### Authentication
+- POST /auth/signup — Register a new user
+- POST /auth/login — Log in and get JWT token
+### Blog Public Endpoints
+- GET /blogs — Get a list of published blogs (paginated, default 20/page)
+  - Filters: state
+  - Search: author, title, tags
+  - Ordering: read_count, reading_time, timestamp
+- GET /blogs/:id — Get a single published blog by ID (increments read_count)
+### Blog Authenticated Endpoints (Require JWT)
+- POST /blogs — Create a new blog (defaults to draft)
+- PATCH /blogs/:id — Update a blog (title, body, tags, etc.)
+- PATCH /blogs/:id/state — Publish a draft blog
+- DELETE /blogs/:id — Delete a blog
+- GET /user/blogs — Get all blogs by the logged-in user (filterable by state)
+---
+## Database
+Use MongoDB with the following models:
+### User
+- first_name: String (required)
+- last_name: String (required)
+- email: String (required, unique)
+- password: String (hashed)
+### Blog
+- title: String (required, unique)
+- description: String
+- author: ObjectId (reference to User)
+- state: String (draft or published)
+- read_count: Number (default 0)
+- reading_time: Number (auto-calculated)
+- tags: [String]
+- body: String (required)
+- timestamp: Date (auto-generated)
+---
+## Architecture
+- Use MVC pattern:
+  - Models: Handle DB schema and logic
+  - Controllers: Handle business logic
+  - Routes: Handle HTTP request/response
+  - Middleware: Handle authentication, validation, error handling
+---
+## Testing
+- Write unit and integration tests for:
+  - All authentication endpoints
+  - All blog-related endpoints (CRUD, filters, search, etc.)
+  - Access control (only owners can modify/delete)
+  - Pagination, ordering, and search features
+---
+## Additional Notes
+- All owner-specific blog actions must verify JWT and blog ownership.
+- Make sure all data returned is properly sanitized and structured.
+- Use status codes and proper error messages consistently.
+---
