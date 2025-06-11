@@ -1,6 +1,9 @@
 const express = require ("express");
 const app = express()
-const PORT = 5000
+require ("dotenv").config()
+
+PORT = process.env.PORT || 5000
+
 // importing external route
 const authRoute = require ("./routes/auth")
 

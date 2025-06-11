@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
+router.get ("/signup", (req, res) => {
+    res.send("Signup endpoint, send post request with signup details")
+})
+
 router.post("/signup", (req, res) => {
     const {email, password} = req.body
     if (!email || !password) {
@@ -10,7 +14,7 @@ router.post("/signup", (req, res) => {
     res.send (`User with email: ${email}, created successfully 🎉`)
     console.log("User registered...");
     
-});
+}); 
 
 router.get ("/login", (req, res)=> {
     res.status(200).send ("Login endpoint")
