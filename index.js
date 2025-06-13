@@ -6,7 +6,7 @@ require ("dotenv").config()
 const authRoute = require ("./routes/signup-login-auth")
 
 
-PORT = process.env.PORT || 5000 // importing port from dotenv and redundant port
+PORT = process.env.PORT || 5000 // importing port from dotenv and including a redundant port
 
 // starting server
 app.listen (PORT, () => {
@@ -17,7 +17,7 @@ app.listen (PORT, () => {
 app.use ( express.json() )
 
 // Routes
-app.use ("/auth", require ("./routes/signup-login-auth")) // adding external route
+app.use ("/auth", require ("./routes/signup-login-auth")) // adding signup route
 
 // Lets see if we can setup protected routes
 const authenticate = require ("./middelware/user-auth")

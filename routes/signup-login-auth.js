@@ -1,20 +1,21 @@
 const express = require("express");
 const router = express.Router();
 const { generateToken } = require ("../jwt functions/jwt")
-const user = require ("../user_schema_model/user");
+const user = require ("../schema_models/user");
 const { compare } = require("bcryptjs");
+
 
 // Main signup route
 router.get ("/signup", (req, res) => {
-    res.send("Signup endpoint, send post request with signup details")
-    console.log(req.method, " request from ", req.url );
+    res.status(200).send("<h1>Signup endpoint, send post request with signup details</h1>")
+    console.log(req.method, " request to url ", req.url );
 })
 
 // Post request for signup
 router.post("/signup", async (req, res) => {
     try {
         const { first_name, last_name, email, password } = req.body
-        console.log(req.method, " request from ", req.url );
+        console.log(req.method, " request to url ", req.url );
 
         // Validation
         if (!first_name || !last_name || !email || !password) {
@@ -60,14 +61,14 @@ router.post("/signup", async (req, res) => {
 
 // Main login route
 router.get("/login", (req, res) => {
-    res.status(200).send("Login endpoint, send POST request with login credentials")
-    console.log(req.method, " request from ", req.url );
+    res.status(200).send("<h1>Login endpoint, send POST request with login credentials</h1>")
+    console.log(req.method, " request to url ", req.url );
 })
 
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body
-        console.log(req.method, " request from ", req.url );
+        console.log(req.method, " request to url ", req.url );
 
         // validation
         if (!email || !password) {

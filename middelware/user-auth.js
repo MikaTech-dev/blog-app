@@ -1,5 +1,5 @@
 const { verifyToken } = require("../jwt functions/jwt");
-const user = require("../user_schema_model/user");
+const user = require("../schema_models/user");
 
 const authenticate = async (req, res, next) => {
     try {
@@ -13,7 +13,7 @@ const authenticate = async (req, res, next) => {
         const token = authHeader.substring(7);
 
         // Verifying token
-        const decoded = await verifyToken(token);
+        const decoded = verifyToken(token);
 
         // Find user
         const foundUser = await user.findById(decoded.userid).select("-password");
