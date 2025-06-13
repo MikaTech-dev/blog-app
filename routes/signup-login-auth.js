@@ -39,7 +39,7 @@ router.post("/signup", async (req, res) => {
         await newUser.save();
 
         // Generate new token
-        const token = generateToken(newUser._id);
+        const token = generateToken(newUser._id);   // ._id is the default object key mongodb creates and stores unique ids for schemas in.
 
         return res.status(201).json({
             message: "User created successfully",

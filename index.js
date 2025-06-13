@@ -16,14 +16,17 @@ app.listen (PORT, () => {
 // Middleware
 app.use ( express.json() )
 
-// Routes
-app.use ("/auth", require ("./routes/signup-login-auth")) // adding signup route
 
 // Lets see if we can setup protected routes
-const authenticate = require ("./middelware/user-auth")
+const authenticate = require ("./middleware/user-auth")
 app.get ("/protected", authenticate, (req, res) => {
     res.json( {message: "This is a protected route!!", user: req.user} )
 })
+
+// Routes
+app.use ("/auth", require ("./routes/signup-login-auth")) // adding signup route
+app.use ("/api", require ("./routes/blog_routes"))
+app.use (authenticate)
 
 app.get ("/", (req, res) => {
     res.status(200).send ("<h1>Welcome to the one blog api by Ikenna Sam-Lebechukwu (ALT/SOE/024/5323)</h1>")

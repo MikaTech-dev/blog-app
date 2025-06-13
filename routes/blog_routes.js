@@ -1,18 +1,20 @@
-const express = require ("express")
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
 
-const authenticate = require ("../middelware/user-auth")
-const blog = require ("../schema_models/blog")
-const user = require ("../schema_models/user")
+const authenticate = require ("../middleware/user-auth")
+const Blog = require ("../schema_models/blog")      // Apparently it's good convention to use PascalCase when importing models
+const User = require ("../schema_models/user")
 
 
 // GET request, Get all published blogs
 router.get ("/blog", async (req, res) => {
     try {
-        const blogs = await blog.find({ state: "published" }.populate("author", "first_name", "last_name"))
-        res.json(blogs)
-    }catch (error) {
-        res.status(400).json ({ message: "Error fetching blogs", error: error.message})
+        // Find blog by its state
+        const blogs = await Blog.find({ state: "published" }).populate("author", "first_name last_name");
+        // .populate() replaces the author field (which is an ObjectId referencing a User) with the actual user data
+        res.json(blogs);
+    } catch (error) {
+        res.status(400).json({ message: "Error fetching blogs", error: error.message });
     }
 })
 
@@ -20,16 +22,16 @@ router.get ("/blog", async (req, res) => {
 router.get ("/blog/:id", authenticate, async (req, res) => {
     const blogURLId = req.params.id
     try {
-        const blog = await blog.findById(blogURLId).populate("author", "first_name", "last_name")
+        const blog = await Blog.findById(blogURLId).populate("author", "first_name", "last_name");
         if (!blog) {
-            res.status(404).json({ message: "Blog not found" })
+            return res.status(404).json({ message: "Blog not found" })
         } 
         // Increasing blog views
-        blog.readCount += 1
-        await blog.save 
-
-    }catch (error) {
-        res.status (400).json ({ message: "This blog could not be found or does not exist.", error: error.message })
+        blog.readCount += 1;
+        await blog.save();
+        res.json(blog);
+    } catch (error) {
+        res.status(400).json({ message: "This blog could not be found or does not exist.", error: error.message });
     }
 })
 
@@ -42,17 +44,17 @@ router.post ("/blog", authenticate, async (req, res) => {
             return res.status (400).json ({ message: "Title and Content are required" })
         }
 
-        const newBlog = new blog ({ 
+        const newBlog = new Blog ({ 
             title: title,
             content: content,
             author: req.user._id
          })
 
          await newBlog.save()
-         res.status(201).json(blog)
+         res.status(201).json(newBlog)
          
-    }catch (error){
-         res.status(500).json({ message: 'Error creating blog', error: error.message });
+    } catch (error) {
+         res.status(500).json({ message: "Error creating blog", error: error.message });
     }
 })
 
@@ -73,7 +75,7 @@ router.patch("/blog/:id", authenticate, async (req, res) => {
         }
 
         // Find the blog by its ID
-        const blog = await blog.findById(blogURLId);
+        const blog = await Blog.findById(blogURLId);
 
         if (!blog) {
             // If the blog doesn't exist, return 404
@@ -97,25 +99,32 @@ router.patch("/blog/:id", authenticate, async (req, res) => {
     }
 })
 
-// DELETE rrequest, Deleting blog (only by said blog's owner)
-router.delete('/blogs/:id', authenticate, async (req, res) => {
-  try {
-    const blog = await Blog.findById(req.params.id);
+// DELETE request, Deleting blog (only by said blog's owner)
+router.delete('/blog/:id', authenticate, async (req, res) => {
+    try {
+        const blog = await Blog.findById(req.params.id);
 
-    if (!blog) {
-      return res.status(404).json({ message: 'Blog not found' });
+        // If the blog does not exist, return 404
+        if (!blog) {
+            return res.status(404).json({ message: 'Blog not found' });
+        }
+
+        // Check if the current user is the author of the blog
+        if (blog.author.toString() !== req.user._id.toString()) {
+            // If not, return a forbidden error
+            return res.status(403).json({ message: 'Not authorized to delete this blog' });
+        }
+
+        // Remove the blog from the database
+        await blog.deleteOne();
+
+        // Respond with a success message
+        res.json({ message: 'Blog deleted successfully' });
+    } catch (error) {
+        // Handle any errors that occur
+        res.status(500).json({ message: 'Error deleting blog', error: error.message });
     }
-
-    if (blog.author.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Not authorized to delete this blog' });
-    }
-
-    await blog.remove();
-
-    res.json({ message: 'Blog deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting blog', error: error.message });
-  }
 });
+
 
 module.exports = router;
