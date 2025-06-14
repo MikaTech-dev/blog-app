@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Blogs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .blog-list {
+            margin-top: 20px;
+        }
+        .blog-item {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .blog-title {
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        .blog-meta {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .blog-content {
+            color: #444;
+            line-height: 1.6;
+        }
+        .read-more {
+            display: inline-block;
+            margin-top: 10px;
+            color: #2196F3;
+            text-decoration: none;
+        }
+        .read-more:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .profile-icon {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .profile-icon:hover {
+            width: 35px;
+            height: 35px;
+        }
+        .profile-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        .profile-icon path {
+            fill: #666;
+        }
+        .no-blogs {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        /* New styles for search, filter, and sort */
+        .controls {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        .pagination a {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #2196F3;
+        }
+        .pagination a.active {
+            background-color: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+        .pagination a:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+        .sort-order {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .sort-order button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            padding: 5px;
+        }
+        .sort-order button:hover {
+            color: #2196F3;
+        }
+        .sort-order button.active {
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>All Blog Posts</h1>
+        <div class="action-buttons">
+            <a href="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+            <a href="/auth/signup" class="profile-icon">
+                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M256,265.308c73.252,0,132.644-59.391,132.644-132.654C388.644,59.412,329.252,0,256,0
+                        c-73.262,0-132.643,59.412-132.643,132.654C123.357,205.917,182.738,265.308,256,265.308z"/>
+                    <path d="M425.874,393.104c-5.922-35.474-36-84.509-57.552-107.465c-5.829-6.212-15.948-3.628-19.504-1.427
+                        c-27.04,16.672-58.782,26.399-92.819,26.399c-34.036,0-65.778-9.727-92.818-26.399c-3.555-2.201-13.675-4.785-19.505,1.427
+                        c-21.55,22.956-51.628,71.991-57.551,107.465C71.573,480.444,164.877,512,256,512C347.123,512,440.427,480.444,425.874,393.104z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <div class="controls">
+        <form id="searchForm" method="GET" action="/blogs">
+            <input type="text" 
+                   name="search" 
+                   class="search-box" 
+                   placeholder="Search blogs..." 
+                   value="<%= search %>">
+            
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="filter">Filter by:</label>
+                    <select name="filter" id="filter" onchange="this.form.submit()">
+                        <% Object.entries(filterOptions).forEach(([value, label]) => { %>
+                            <option value="<%= value %>" <%= filter === value ? 'selected' : '' %>>
+                                <%= label %>
+                            </option>
+                        <% }); %>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="sort">Sort by:</label>
+                    <div class="sort-order">
+                        <select name="sort" id="sort" onchange="this.form.submit()">
+                            <% Object.entries(sortOptions).forEach(([value, label]) => { %>
+                                <option value="<%= value %>" <%= sort === value ? 'selected' : '' %>>
+                                    <%= label %>
+                                </option>
+                            <% }); %>
+                        </select>
+                        <button type="button" 
+                                onclick="toggleOrder()" 
+                                class="<%= order === 1 ? 'active' : '' %>">
+                            <%= order === 1 ? '⬆️' : '⬇️' %>
+                        </button>
+                        <input type="hidden" name="order" value="<%= order === 1 ? 'asc' : 'desc' %>">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="blog-list">
+        <% if (blogs && blogs.length > 0) { %>
+            <% blogs.forEach(blog => { %>
+                <div class="blog-item">
+                    <h2 class="blog-title"><%= blog.title %></h2>
+                    <div class="blog-meta">
+                        By <%= blog.author.first_name %> <%= blog.author.last_name %> | 
+                        <%= new Date(blog.createdAt).toLocaleDateString() %> | 
+                        <%= blog.readCount %> <%= blog.readCount === 1 ? "read" : "reads" %>
+                        Read time: <%= blog.readingTime %> <%= blog.readingTime === 1 ? "minute" : "minutes" %>
+                    </div>
+                    <div class="blog-content">
+                        <%= blog.content.substring(0, 200) %>...
+                    </div>
+                    <a href="/blogs/<%= blog._id %>" class="read-more">Read More →</a>
+                </div>
+            <% }); %>
+
+            <div class="pagination">
+                <% if (pagination.page > 1) { %>
+                    <a href="?page=<%= pagination.page - 1 %>&search=<%= search %>&sort=<%= sort %>&order=<%= order === 1 ? 'asc' : 'desc' %>&filter=<%= filter %>">Previous</a>
+                <% } %>
+                
+                <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+                    <a href="?page=<%= i %>&search=<%= search %>&sort=<%= sort %>&order=<%= order === 1 ? 'asc' : 'desc' %>&filter=<%= filter %>"
+                       class="<%= pagination.page === i ? 'active' : '' %>">
+                        <%= i %>
+                    </a>
+                <% } %>
+
+                <% if (pagination.page < pagination.totalPages) { %>
+                    <a href="?page=<%= pagination.page + 1 %>&search=<%= search %>&sort=<%= sort %>&order=<%= order === 1 ? 'asc' : 'desc' %>&filter=<%= filter %>">Next</a>
+                <% } %>
+            </div>
+        <% } else { %>
+            <div class="no-blogs">
+                <h2>No blogs found</h2>
+                <p>Be the first to write a blog post!</p>
+            </div>
+        <% } %>
+    </div>
+
+    <script>
+        function toggleOrder() {
+            const orderInput = document.querySelector('input[name="order"]');
+            const orderButton = document.querySelector('.sort-order button');
+            const currentOrder = orderInput.value;
+            const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+            
+            orderInput.value = newOrder;
+            orderButton.textContent = newOrder === 'asc' ? '⬆️' : '⬇️';
+            orderButton.classList.toggle('active');
+            
+            document.getElementById('searchForm').submit();
+        }
+
+        // Add debounce to search input
+        let searchTimeout;
+        document.querySelector('input[name="search"]').addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                this.form.submit();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title><%= blog.title %></title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+                line-height: 1.6;
+            }
+            .blog-header {
+                margin-bottom: 30px;
+                border-bottom: 2px solid #eee;
+                padding-bottom: 20px;
+            }
+            .blog-title {
+                color: #333;
+                margin: 0 0 10px 0;
+            }
+            .blog-meta {
+                color: #666;
+                font-size: 0.9em;
+                margin-bottom: 20px;
+            }
+            .blog-content {
+                color: #444;
+                font-size: 1.1em;
+                line-height: 1.8;
+                white-space: pre-wrap;
+            }
+            .blog-actions {
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 2px solid #eee;
+            }
+            .btn {
+                padding: 8px 15px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+                margin-right: 10px;
+            }
+            .btn-primary {
+                background-color: #4CAF50;
+                color: white;
+            }
+            .btn-secondary {
+                background-color: #2196F3;
+                color: white;
+            }
+            .btn-danger {
+                background-color: #f44336;
+                color: white;
+            }
+            .btn:hover {
+                opacity: 0.9;
+            }
+            .state-badge {
+                display: inline-block;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 0.8em;
+                margin-left: 10px;
+            }
+            .state-draft {
+                background-color: #ffd700;
+                color: #000;
+            }
+            .state-published {
+                background-color: #4CAF50;
+                color: white;
+            }
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+            .action-buttons {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            }
+            .profile-icon {
+                width: 30px;
+                height: 30px;
+                cursor: pointer;
+                transition: 0.2s;
+            }
+            .profile-icon:hover {
+                width: 35px;
+                height: 35px;
+            }
+            .profile-icon svg {
+                width: 100%;
+                height: 100%;
+            }
+            .profile-icon path {
+                fill: #666;
+            }
+        </style>
+    </head>
+    <body>
+    <div class="header">
+        <h1>Blog Post</h1>
+        <div class="action-buttons">
+            <a href="/blogs" class="btn btn-primary">← Back to All Blogs</a>
+            <a href="/auth/signup" class="profile-icon">
+                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M256,265.308c73.252,0,132.644-59.391,132.644-132.654C388.644,59.412,329.252,0,256,0
+                        c-73.262,0-132.643,59.412-132.643,132.654C123.357,205.917,182.738,265.308,256,265.308z"/>
+                    <path d="M425.874,393.104c-5.922-35.474-36-84.509-57.552-107.465c-5.829-6.212-15.948-3.628-19.504-1.427
+                        c-27.04,16.672-58.782,26.399-92.819,26.399c-34.036,0-65.778-9.727-92.818-26.399c-3.555-2.201-13.675-4.785-19.505,1.427
+                        c-21.55,22.956-51.628,71.991-57.551,107.465C71.573,480.444,164.877,512,256,512C347.123,512,440.427,480.444,425.874,393.104z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+        <div class="blog-header">
+            <h2 class="blog-title">
+                <%= blog.title %>
+                <span class="state-badge state-<%= blog.state %>"><%= blog.state %></span>
+            </h2>
+            <div class="blog-meta">
+                By <%= blog.author.first_name %> <%= blog.author.last_name %> | 
+                <%= new Date(blog.createdAt).toLocaleDateString() %> | 
+                <%= blog.readCount %> <%= blog.readCount === 1 ? "read" : "reads" %>
+                Read time: <%= blog.readingTime %> <%= blog.readingTime === 1 ? 'minute' : 'minutes' %>
+            </div>
+        </div>
+
+        <div class="blog-content">
+            <%= blog.content %>
+        </div>
+
+        <% if (typeof user !== 'undefined' && blog.author._id.toString() === user._id.toString()) { %>
+            <div class="blog-actions">
+                <a href="/blogs/<%= blog._id %>/edit" class="btn btn-secondary">Edit Blog</a>
+                <form action="/blogs/<%= blog._id %>?_method=DELETE" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete Blog</button>
+                </form>
+            </div>
+        <% } %>
+    </body>
+    </html>

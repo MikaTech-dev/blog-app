@@ -1,6 +1,6 @@
 const express = require ("express");
 const app = express()
-const connectDB = require ("./db_config/mongoose")
+const connectDB = require ("./config/mongoose")
 require ("dotenv").config()
 // importing external route
 const authRoute = require ("./routes/signup-login-auth")
@@ -15,6 +15,13 @@ app.listen (PORT, () => {
 
 // Middleware
 app.use ( express.json() )
+const cookieParser = require("cookie-parser")
+app.use(cookieParser())
+
+// EJS view engine and static files setup
+app.set("view engine", "ejs")
+app.set("views", "./views")
+app.use(express.urlencoded({ extended: true })) // For form data
 
 
 // Lets see if we can setup protected routes
@@ -23,14 +30,22 @@ app.get ("/protected", authenticate, (req, res) => {
     res.json( {message: "This is a protected route!!", user: req.user} )
 })
 
+
+
 // Routes
-app.use ("/auth", require ("./routes/signup-login-auth")) // adding signup route
-app.use ("/api", require ("./routes/blog_routes"))
+app.use ("/auth", require ("./routes/signup-login-auth")) // adding signup/login route
+app.use ("/api", require ("./routes/blog_routes"))          // blog routes
+app.use ("/", require("./routes/blog_routes"))
 app.use (authenticate)
 
 app.get ("/", (req, res) => {
-    res.status(200).send ("<h1>Welcome to the one blog api by Ikenna Sam-Lebechukwu (ALT/SOE/024/5323)</h1>")
+    res.status(200).send ("<h1>Blog api by Ikenna Sam-Lebechukwu (ALT/SOE/024/5323)</h1>")
     console.log("Sucessfull GET response");
+})
+
+// Render create blog form (EJS view)
+app.get('/blog/create', authenticate, (req, res) => {
+    res.render('create-blog')
 })
 
 connectDB();

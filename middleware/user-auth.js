@@ -1,16 +1,14 @@
-const { verifyToken } = require("../jwt functions/jwt");
-const user = require("../schema_models/user");
+const { verifyToken } = require("../utils/jwt");
+const user = require("../models/user");
+const cookieParser = require("cookie-parser")
 
 const authenticate = async (req, res, next) => {
     try {
-        // Extracting token from header
-        const authHeader = req.header("Authorization");
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({ message: "Access denied, no token provided" });
+        // Extracting token from header/cookies
+        const token = req.cookies.token
+        if (!token) {
+            return res.status(401).json({ message: "Access denied, no token provided" })
         }
-
-        // Formatting and extracting token
-        const token = authHeader.substring(7);
 
         // Verifying token
         const decoded = verifyToken(token);
@@ -27,14 +25,14 @@ const authenticate = async (req, res, next) => {
     } catch (error) {
         // Error handling for token expiry
         if (error.name === "TokenExpiredError") {
-            return res.status(401).json({ message: 'Token has expired' });
+            return res.status(401).json({ message: "Token has expired" });
         }
 
         if (error.name === "JsonWebTokenError") {
-            return res.status(401).json({ message: 'Invalid token' });
+            return res.status(401).json({ message: "Invalid token" });
         }
         
-        return res.status(500).json({ message: 'Server error during authentication', error: error.message });
+        return res.status(500).json({ message: "Server error during authentication" , error: error.message });
     }
 };
 

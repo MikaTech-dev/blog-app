@@ -1,15 +1,20 @@
 const express = require("express");
 const router = express.Router();
-const { generateToken } = require ("../jwt functions/jwt")
-const user = require ("../schema_models/user");
+const { generateToken } = require ("../utils/jwt")
+const user = require ("../models/user");
 const { compare } = require("bcryptjs");
 
 
-// Main signup route
-router.get ("/signup", (req, res) => {
-    res.status(200).send("<h1>Signup endpoint, send post request with signup details</h1>")
-    console.log(req.method, " request to url ", req.url );
+// Render signup form ejs
+router.get('/signup', (req, res) => {
+    res.render('signup')
 })
+
+// Render login form ejs
+router.get('/login', (req, res) => {
+    res.render('login')
+})
+
 
 // Post request for signup
 router.post("/signup", async (req, res) => {
@@ -41,6 +46,17 @@ router.post("/signup", async (req, res) => {
         // Generate new token
         const token = generateToken(newUser._id);   // ._id is the default object key mongodb creates and stores unique ids for schemas in.
 
+        // Set httpOnly cookie with token
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',  // cookie will only be sent over https if NODE_ENV is "production" i.e you're on a production build of node js. Otherwise, apparently it defaults to "development"
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        })
+
+        // Also send token in response header
+        res.setHeader('Authorization', `Bearer ${token}`)
+
         return res.status(201).json({
             message: "User created successfully",
             token,
@@ -59,12 +75,7 @@ router.post("/signup", async (req, res) => {
     }
 });
 
-// Main login route
-router.get("/login", (req, res) => {
-    res.status(200).send("<h1>Login endpoint, send POST request with login credentials</h1>")
-    console.log(req.method, " request to url ", req.url );
-})
-
+// Post request for login
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body
@@ -92,17 +103,12 @@ router.post("/login", async (req, res) => {
 
         // generating new token
         const token = generateToken(foundUser._id)
-
-        return res.status(200).json({ 
-            message: "Logged in successfully🎉", 
-            token,
-            user: {
-                id: foundUser._id,
-                first_name: foundUser.first_name,
-                last_name: foundUser.last_name,
-                email: foundUser.email
-            }
-        });
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+        })
+        return res.redirect('/dashboard')
 
     } catch (error) {
         return res.status(400).json({ message: "server error, unable to log in", error: error.message });
