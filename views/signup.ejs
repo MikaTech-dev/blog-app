@@ -12,7 +12,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f7f7f7;
+            background: #8b8b8b;
         }
         .form-container {
             background-color: #fff;
@@ -60,11 +60,25 @@
             margin-top: 20px;
         }
         .login-link a {
-            color: #2196F3;
+            color: #45a049;
             text-decoration: none;
         }
         .login-link a:hover {
             text-decoration: underline;
+        }
+        .login-link a:visited {
+            color: #45a049;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            background-color: #f7f7f7;
+            color: #45a049;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -81,6 +95,9 @@
         <div class="login-link">
             <p>Already have an account? <a href="/auth/login">Login here</a></p>
         </div>
+    </div>
+    <div class="footer">
+        Made with ⚡ by Mikatech/Crescentech
     </div>
 </body>
 </html>
