@@ -69,7 +69,7 @@ router.post('/blogs', authenticate, async (req, res) => {
             state: state
         })
         await newBlog.save()
-        res.redirect('/s')
+        res.redirect('/')
     } catch (error) {
         res.status(500).render('create_blog', { 
             error: 'Error creating blog',
