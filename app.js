@@ -46,7 +46,7 @@ app.get('/blog/create', authenticate, (req, res) => {
 app.use((req, res) => {
     res.status(404).render('error', {
         message: "The page you are looking for does not exist.",
-        error: null
+        error: "404 Not Found"
     })
 })
 
