@@ -10,7 +10,7 @@ const User = require("../models/user")
 router.use(methodOverride('_method'));
 
 // GET /dashboard - Renders the dashboard page with user's blogs
-router.get('/dashboard', authenticate, async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
     try {
         // Find all blogs by the current user
         const blogs = await Blog.find({ author: req.user._id }).sort({ createdAt: -1 });
@@ -69,7 +69,7 @@ router.post('/blogs', authenticate, async (req, res) => {
             state: state
         })
         await newBlog.save()
-        res.redirect('/dashboard')
+        res.redirect('/s')
     } catch (error) {
         res.status(500).render('create_blog', { 
             error: 'Error creating blog',
@@ -101,7 +101,7 @@ router.put('/blogs/:id', authenticate, async (req, res) => {
         blog.content = content
         blog.state = state
         await blog.save()
-        res.redirect('/dashboard')
+        res.redirect('/')
     } catch (error) {
         res.status(500).render('single_blog', { 
             blog: { ...req.body, _id: req.params.id },
@@ -121,7 +121,7 @@ router.delete('/blogs/:id', authenticate, async (req, res) => {
             return res.status(403).json({ message: 'Not authorized to delete this blog' });
         }
         await blog.deleteOne();
-        res.redirect('/dashboard');
+        res.redirect('/');
     } catch (error) {
         res.status(500).json({ message: 'Error deleting blog', error: error.message });
     }

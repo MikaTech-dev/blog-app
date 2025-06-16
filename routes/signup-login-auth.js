@@ -57,8 +57,8 @@ router.post("/signup", async (req, res) => {
         // Also send token in response header
         res.setHeader('Authorization', `Bearer ${token}`)
 
-        return res.redirect("/dashboard")
-        
+        return res.redirect("/")
+
     } catch (error) {
         // Only send one response
         if (!res.headersSent) {
@@ -100,7 +100,7 @@ router.post("/login", async (req, res) => {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict'
         })
-        return res.redirect('/dashboard')
+        return res.redirect('/')
 
     } catch (error) {
         return res.status(400).render({ message: "server error, unable to log in", error: error.message });
