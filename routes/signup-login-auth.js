@@ -24,13 +24,13 @@ router.post("/signup", async (req, res) => {
 
         // Validation
         if (!first_name || !last_name || !email || !password) {
-           return res.status(400).json( {message: "All fields are required, you might be missing something..."} )
+           return res.status(400).render( {message: "All fields are required, you might be missing something...", error: null} )
         }
         
         // checking for existing user
         const existingUser = await user.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: "A user with this email already exists..." });
+            return res.status(400).render({ message: "A user with this email already exists...", error: null });
         }
 
         // Creating a new user
@@ -57,20 +57,12 @@ router.post("/signup", async (req, res) => {
         // Also send token in response header
         res.setHeader('Authorization', `Bearer ${token}`)
 
-        return res.status(201).json({
-            message: "User created successfully",
-            token,
-            user: {
-                id: newUser._id,
-                first_name: newUser.first_name,
-                last_name: newUser.last_name,
-                email: newUser.email  
-            }
-        });
+        return res.redirect("/dashboard")
+        
     } catch (error) {
         // Only send one response
         if (!res.headersSent) {
-            return res.status(500).json({ message: "Server error, user validation failed", error: error.message });
+            return res.status(500).render({ message: "Server error, user validation failed", error: error.message });
         }
     }
 });
@@ -84,21 +76,21 @@ router.post("/login", async (req, res) => {
         // validation
         if (!email || !password) {
             console.log("might not have entered some stuff");
-            return res.status(400).json({ message: "Email and password are required, you might be missing something..." })
+            return res.status(400).render({ message: "Email and password are required, you might be missing something...", error: null })
         }
 
         // Finding and validating user
         const foundUser = await user.findOne({ email });
         if (!foundUser) {    // if email doesn't exist
             console.log("Incorrect info/info doesn't align with schema00");
-            return res.status(400).json({ message: "Invalid email or password" })
+            return res.status(400).render("error",{ message: "Invalid email or password", error: null})
         }
 
         // checking password
         const isPasswordCorrect = await foundUser.comparePassword(password)
         if (!isPasswordCorrect) {
             console.log("Incorrect info/info doesn't align with schema01"); 
-            return res.status(400).json({ message: "Invalid email or password" })
+            return res.status(400).render({ message: "Invalid email or password", error: null })
         }
 
         // generating new token
@@ -111,7 +103,7 @@ router.post("/login", async (req, res) => {
         return res.redirect('/dashboard')
 
     } catch (error) {
-        return res.status(400).json({ message: "server error, unable to log in", error: error.message });
+        return res.status(400).render({ message: "server error, unable to log in", error: error.message });
     }
 });
 

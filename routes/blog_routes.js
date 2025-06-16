@@ -131,7 +131,7 @@ router.delete('/blogs/:id', authenticate, async (req, res) => {
 router.get('/blogs', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 4;
+        const limit = parseInt(req.query.limit) || 20;
         const search = req.query.search || '';
         const sort = req.query.sort || 'createdAt';
         const order = req.query.order === 'asc' ? 1 : -1;
