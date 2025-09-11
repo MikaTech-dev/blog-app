@@ -78,3 +78,6 @@ ___
 – Host it on PipeOps/Heroku
 
 – Share the PipeOps/Heroku link and the GitHub link using the AltSchool of Engineering Tinyuka Second Semester Project Submission (Nodejs)
+
+console.log(require('crypto').randomBytes(32).toString('hex')) -- to generate a "random" cryptographic 32byte string for jwt key
+JWT_EXPIRES_IN=1h
