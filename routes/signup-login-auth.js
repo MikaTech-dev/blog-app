@@ -15,6 +15,16 @@ router.get('/login', (req, res) => {
     res.render('login')
 })
 
+// Clear token and redirect to login
+router.get("/logout", (req, res)=> {
+    res.clearCookie('token', { 
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === 'production', 
+        sameSite: 'strict' 
+    });
+    res.redirect('/auth/login');
+});
+
 
 // Post request for signup
 router.post("/signup", async (req, res) => {
@@ -23,14 +33,14 @@ router.post("/signup", async (req, res) => {
         console.log(req.method, " request to url ", req.url );
 
         // Validation
-        if (!first_name || !last_name || !email || !password) {
-           return res.status(400).render( {message: "All fields are required, you might be missing something...", error: null} )
-        }
+          if (!first_name || !last_name || !email || !password) {
+              return res.status(400).render('signup', { message: "All fields are required, you might be missing something...", error: null })
+          }
         
         // checking for existing user
         const existingUser = await user.findOne({ email });
         if (existingUser) {
-            return res.status(400).render({ message: "A user with this email already exists...", error: null });
+            return res.status(400).render('signup', { message: "A user with this email already exists...", error: null });
         }
 
         // Creating a new user
@@ -51,7 +61,7 @@ router.post("/signup", async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',  // cookie will only be sent over https if NODE_ENV is "production" i.e you're on a production build of node js. Otherwise, apparently it defaults to "development"
             sameSite: 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            maxAge: 2 * 24 * 60 * 60 * 1000 // 7 days
         })
 
         // Also send token in response header
@@ -62,7 +72,7 @@ router.post("/signup", async (req, res) => {
     } catch (error) {
         // Only send one response
         if (!res.headersSent) {
-            return res.status(500).render({ message: "Server error, user validation failed", error: error.message });
+            return res.status(500).render('error', { message: "Server error, user validation failed", error: error.message });
         }
     }
 });
@@ -76,7 +86,7 @@ router.post("/login", async (req, res) => {
         // validation
         if (!email || !password) {
             console.log("might not have entered some stuff");
-            return res.status(400).render({ message: "Email and password are required, you might be missing something...", error: null })
+            return res.status(400).render('login', { message: "Email and password are required, you might be missing something...", error: null })
         }
 
         // Finding and validating user
@@ -90,7 +100,7 @@ router.post("/login", async (req, res) => {
         const isPasswordCorrect = await foundUser.comparePassword(password)
         if (!isPasswordCorrect) {
             console.log("Incorrect info/info doesn't align with schema01"); 
-            return res.status(400).render({ message: "Invalid email or password", error: null })
+            return res.status(400).render('login', { message: "Invalid email or password", error: null })
         }
 
         // generating new token
@@ -103,7 +113,7 @@ router.post("/login", async (req, res) => {
         return res.redirect('/')
 
     } catch (error) {
-        return res.status(400).render({ message: "server error, unable to log in", error: error.message });
+        return res.status(400).render('error', { message: "server error, unable to log in", error: error.message });
     }
 });
 

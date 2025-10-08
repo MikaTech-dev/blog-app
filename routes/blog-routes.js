@@ -4,21 +4,9 @@ const methodOverride = require('method-override');
 
 const authenticate = require("../middleware/user-auth")
 const Blog = require("../models/blog")
-const User = require("../models/user")
 
 // Enable method override for PUT and DELETE requests
 router.use(methodOverride('_method'));
-
-// GET /dashboard - Renders the dashboard page with user's blogs
-router.get('/', authenticate, async (req, res) => {
-    try {
-        // Find all blogs by the current user
-        const blogs = await Blog.find({ author: req.user._id }).sort({ createdAt: -1 });
-        res.render('dashboard', { user: req.user, blogs: blogs });
-    } catch (error) {
-        res.status(500).render('error', { message: 'Error loading dashboard', error: error.message });
-    }
-});
 
 // GET /blogs/create - Render create blog form
 router.get('/blogs/create', authenticate, (req, res) => {
@@ -69,7 +57,7 @@ router.post('/blogs', authenticate, async (req, res) => {
             state: state
         })
         await newBlog.save()
-        res.redirect('/')
+        res.redirect('/dashboard')
     } catch (error) {
         res.status(500).render('create_blog', { 
             error: 'Error creating blog',
@@ -121,14 +109,14 @@ router.delete('/blogs/:id', authenticate, async (req, res) => {
             return res.status(403).json({ message: 'Not authorized to delete this blog' });
         }
         await blog.deleteOne();
-        res.redirect('/');
+        res.redirect('/dashboard');
     } catch (error) {
         res.status(500).json({ message: 'Error deleting blog', error: error.message });
     }
 });
 
 // GET /blogs - Get all published blogs (public route)
-router.get('/blogs', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
@@ -184,6 +172,7 @@ router.get('/blogs', async (req, res) => {
         };
 
         res.render('blogs', { 
+            user: req.user,
             blogs,
             pagination: {
                 page,

@@ -25,17 +25,12 @@ app.set("views", "./views")
 app.use(express.urlencoded({ extended: true })) //  Parse URL-encoded bodies (HTML forms send data encoded in the URL upon submission)
 
 // Routes
-app.use ("/auth", require ("./routes/signup-login-auth")) // adding signup/login route
-app.use ("/api", require ("./routes/blog_routes"))          // blog routes
-app.use ("/", require("./routes/blog_routes"))
+app.use ("/auth", require ("./routes/signup-login-auth")) // adding signup/login route          // blog routes
+app.use ("/", require("./routes/blog-routes"))
+app.use("/", require ("./routes/user-dashboard"))
 
 
 app.use (authenticate)
-
-app.get ("/", (req, res) => {
-    res.status(200).send ("<h1>Blog api by Ikenna Sam-Lebechukwu (ALT/SOE/024/5323)</h1>")
-    console.log("Sucessfull GET response");
-})
 
 // Render create blog form (EJS view)
 app.get('/blog/create', authenticate, (req, res) => {
@@ -51,4 +46,3 @@ app.use((req, res) => {
 })
 
 connectDB();
-module.exports = app
