@@ -139,7 +139,7 @@ GET http://localhost:5000/
 
 **View Specific Blog**
 ```
-GET http://localhost:5000/blogs/64a7b9e1f8d8e42c12345678
+GET http://localhost:5000/blogs/[existingblogid67420]
 ```
 
 ---
