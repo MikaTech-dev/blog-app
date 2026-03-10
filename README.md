@@ -1,83 +1,168 @@
-# blog-api
-blog api creation
+# Blogging API
 
+A secure blogging platform built with **Node.js, Express, MongoDB, and EJS**, featuring user authentication, blog management, and a simple frontend interface.
 
-You are required to build a blogging api. The general idea here is that the api has a general endpoint that shows a list of articles that have been created by different people, and anybody that calls this endpoint, should be able to read a blog created by them or other users.
+##  Features
+-  JWT Authentication (signup/login)
+-  Full Blog CRUD Operations
+-  Reading time calculation (auto-calculated based on content length)
+-  Draft/Published state control
+-  Read count tracking (increases on each view)
+-  Owner-only edit/delete access
+-  EJS-powered frontend views with CSS styling
+-  Comprehensive testing setup for core functionality
 
-Requirements
+---
 
-Users should have a first_name, last_name, email, password, (you can add other attributes you want to store about the user)
-A user should be able to sign up and sign in into the blog app
-Use JWT as authentication strategy and expire the token after 1 hour
-A blog can be in two states; draft and published
-Logged in and not logged in users should be able to get a list of published blogs created
-Logged in and not logged in users should be able to to get a published blog
-Logged in users should be able to create a blog.
-When a blog is created, it is in draft state
-The owner of the blog should be able to update the state of the blog to published
- The owner of a blog should be able to edit the blog in draft or published state
- The owner of the blog should be able to delete the blog in draft or published state
-The owner of the blog should be able to get a list of their blogs.
-The endpoint should be paginated
-It should be filterable by state
-Blogs created should have title, description, tags, author, timestamp, state, read_count, reading_time and body.
-The list of blogs endpoint that can be accessed by both logged in and not logged in users should be paginated,
-default it to 20 blogs per page. 
-It should also be searchable by author, title and tags.
-It should also be orderable by read_count, reading_time and timestamp
-When a single blog is requested, the api should return the user information(the author) with the blog. The read_count of the blog too should be updated by 1
-Come up with any algorithm for calculating the reading_time of the blog.
-Write tests for all endpoints
-Note:
+##  Wanna test it out yourself?
 
-The owner of the blog should be logged in to perform actions
+### 1. Clone the Repository
+``` 
+git clone https://github.com/your-username/blogging-api.git
+cd blogging-api
+```
 
-Use the MVC pattern
+### 2. Install Dependencies
+``` 
+npm install
+```
 
-Database
-
-Use MongoDB
-​Data Models
-
-___
-
-User
-
-– email is required and should be unique
-
-– first_name and last_name is required
-
-– password
-
-Blog/Article
-
-– title is required and unique
-
-– description
-
-– author
-
-– state
-
-– read_count
-
-– reading_time
-
-– tags
-
-– body is required
-
-– timestamp
-
-Submission
-
-___
-
-– Push your code to GitHub 
-
-– Host it on PipeOps/Heroku
-
-– Share the PipeOps/Heroku link and the GitHub link using the AltSchool of Engineering Tinyuka Second Semester Project Submission (Nodejs)
-
-console.log(require('crypto').randomBytes(32).toString('hex')) -- to generate a "random" cryptographic 32byte string for jwt key
+### 3. Set Up Environment Variables
+Create a `.env` file in the root directory:
+```env
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/blogging-api
+JWT_SECRET=your-super-secret-jwt-key-here-make-it-long-and-random
 JWT_EXPIRES_IN=1h
+```
+
+> **Security Tip**: Generate a strong secret key using:
+> ``` 
+> node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+> ```
+
+---
+
+## Database Setup
+
+### Option A: Local MongoDB
+Ensure MongoDB is running locally:
+``` 
+mongod
+```
+
+### Option B: MongoDB Atlas (Recommended for Deployment)
+Use cloud-hosted MongoDB:
+```env
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.abcd.mongodb.net/blogging-api?retryWrites=true&w=majority
+```
+
+---
+
+##  Running the Application
+
+### Development Mode
+``` 
+npm run dev
+```
+
+### Production Mode
+``` 
+npm start
+```
+
+The server will run at `http://localhost:${PORT}`
+
+---
+
+## API Endpoints
+
+| Method | Route | Description | Access |
+|-------|-------|-------------|--------|
+| GET | `/` | Get all published blogs | Public |
+| POST | `/auth/signup` | Register a new user | Public |
+| POST | `/auth/login` | Login and get JWT token | Public |
+| GET | `/dashboard` | User dashboard (EJS) | Authenticated Users |
+| POST | `/blogs/create` | Create a new blog | Authenticated Users |
+| PUT | `/blogs/:id/edit` | Update an existing blog | Blog owner Only |
+| DELETE | `/blogs/:id` | Delete a blog | Blog owner Only |
+| GET | `/blogs/:id` | View a specific blog | Public |
+
+---
+
+## Example Requests
+
+### 1. User Authentication
+
+**Signup**
+``` 
+POST http://localhost:5000/auth/signup
+Content-Type: application/json
+
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+**Login**
+``` 
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+### 2. Blog Management
+
+**Create a Blog**
+``` 
+POST http://localhost:5000/blogs/create
+Authorization: Bearer YOUR_JWT_TOKEN
+Content-Type: application/json
+
+{
+  "title": "My First Blog",
+  "content": "This is the content of my first blog post."
+}
+```
+
+**Get All Published Blogs**
+```
+GET http://localhost:5000/
+```
+
+**View Specific Blog**
+```
+GET http://localhost:5000/blogs/64a7b9e1f8d8e42c12345678
+```
+
+---
+
+## Frontend Interface (EJS)
+
+View the web interface at:
+
+- `http://localhost:5000/auth/signup` – Registration page  
+- `http://localhost:5000/auth/login` – Login page  
+- `http://localhost:5000/dashboard` – User dashboard  
+- `http://localhost:5000/blogs/create` – Create blog form  
+
+After login, tokens are automatically stored in browser `localStorage`.
+
+---
+
+## Deployment
+
+Personally deployed to **Pipeops** with MongoDB Atlas, but you can use other PAAS and MongoDB cloud providers and it (probably) won't break lol
+
+### Environment Variables in Production
+Set these variables in your PaaS dashboard:
+- `MONGODB_URI` – Your MongoDB connection string
+- `JWT_SECRET` – Secure JWT signing key
+- `PORT` – Port number (optional as it defaults to 5000)
